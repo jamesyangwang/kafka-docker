@@ -1,0 +1,36 @@
+
+docker exec -it ff27498864d6 bash
+
+#'bash' first if in 'fish' shell
+start-kafka-shell.sh <DOCKER_HOST_IP> <ZK_HOST:ZK_PORT>
+~/docker/kafka-docker/start-kafka-shell.sh localhost.digicert.com localhost.digicert.com:2181
+
+#add $ZK if did not pass in with previous command
+$KAFKA_HOME/bin/kafka-topics.sh --create --topic topic --partitions 4 --zookeeper localhost.digicert.com:2181 --replication-factor 2
+$KAFKA_HOME/bin/kafka-topics.sh --create --topic topic --partitions 4 --zookeeper $ZK --replication-factor 2
+$KAFKA_HOME/bin/kafka-topics.sh --describe --topic topic --zookeeper $ZK
+$KAFKA_HOME/bin/kafka-console-producer.sh --topic topic --broker-list=localhost.digicert.com:32775,localhost.digicert.com:32774,localhost.digicert.com:32773
+$KAFKA_HOME/bin/kafka-console-producer.sh --topic topic --broker-list=`broker-list.sh`
+$KAFKA_HOME/bin/kafka-console-consumer.sh --topic topic --bootstrap-server localhost.digicert.com:32773
+Ctrl-Z / Ctrl-C to stop
+
+
+cd /opt/kafka/bin
+kafka-topics.sh --zookeeper localhost.digicert.com:2181 --topic first-topic --create --partitions 3 --replication-factor 2
+kafka-topics.sh --zookeeper localhost.digicert.com:2181 --list
+kafka-topics.sh --zookeeper localhost.digicert.com:2181 --topic first-topic --describe
+kafka-topics.sh --zookeeper localhost.digicert.com:2181 --topic first-topic --delete
+
+kafka-console-producer.sh --topic first-topic --broker-list=localhost.digicert.com:32775,localhost.digicert.com:32774,localhost.digicert.com:32773
+kafka-console-producer.sh --topic first-topic --broker-list=localhost.digicert.com:32775,localhost.digicert.com:32774,localhost.digicert.com:32773 --producer-property acks=all
+
+kafka-console-consumer.sh --topic first-topic --bootstrap-server localhost.digicert.com:32773
+kafka-console-consumer.sh --topic first-topic --bootstrap-server localhost.digicert.com:32773 --from-beginning
+
+#consumer number in the same group can NOT more than partition number, or extra consumers never get messages
+kafka-console-consumer.sh --topic first-topic --bootstrap-server localhost.digicert.com:32773 --group first-app
+kafka-console-consumer.sh --topic first-topic --bootstrap-server localhost.digicert.com:32773 --group second-app --from-beginning
+
+kafka-consumer-groups.sh --bootstrap-server localhost.digicert.com:32773 --list
+kafka-consumer-groups.sh --bootstrap-server localhost.digicert.com:32773 --describe --group first-app
+kafka-consumer-groups.sh --bootstrap-server localhost.digicert.com:32773 --group first-app --reset-offsets --to-earliest --topic first-topic --execute
