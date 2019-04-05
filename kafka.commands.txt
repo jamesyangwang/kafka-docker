@@ -1,9 +1,14 @@
 
+docker-compose up
+docker-compose up --scale kafka=3
+docker-compose down
+
 docker exec -it ff27498864d6 bash
 
 #'bash' first if in 'fish' shell
 start-kafka-shell.sh <DOCKER_HOST_IP> <ZK_HOST:ZK_PORT>
 ~/docker/kafka-docker/start-kafka-shell.sh localhost.digicert.com localhost.digicert.com:2181
+. start-kafka-shell.sh localhost.digicert.com localhost.digicert.com:2181
 
 #add $ZK if did not pass in with previous command
 $KAFKA_HOME/bin/kafka-topics.sh --create --topic topic --partitions 4 --zookeeper localhost.digicert.com:2181 --replication-factor 2
